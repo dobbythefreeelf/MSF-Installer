@@ -581,6 +581,7 @@ function usage ()
     echo "-i                :Install Metasploit Framework."
     echo "-p <password>     :password for Metasploit databse msf user. If not provided a random one is generated for you."
     echo "-r                :Installs Ruby using Ruby Version Manager."
+    echo "-n 				:Will not compile nmap in case you have the updated version."
     echo "-h                :This help message"
 }
 
@@ -658,12 +659,13 @@ function install_ruby_rvm
 [[ ! $1 ]] && { usage; exit 0; }
 #Variable with log file location for trobleshooting
 LOGFILE="/tmp/msfinstall$NOW.log"
-while getopts "irp:h" options; do
+while getopts "irpn:h" options; do
     case $options in
         p ) MSFPASS=$OPTARG;;
         i ) INSTALL=0;;
         h ) usage;;
         r ) RVM=0;;
+		n ) NMA=0;;
         \? ) usage
         exit 1;;
         * ) usage
@@ -707,7 +709,10 @@ if [ $INSTALL -eq 0 ]; then
             install_ruby_rvm
         fi
 
-        install_nmap_linux
+        if [[ $NMA -eq 0 ]]; then
+        	install_nmap_linux
+        fi
+
         configure_psql_deb
         install_msf_linux
         install_plugins_linux
